@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Card Tracker - Registo</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../img/poke-ball.png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/Style.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <!-- Header -->
+    <header class="py-3 w-100">
+        <a class="d-flex align-items-center ms-3 text-decoration-none" href="mainpage.html">
+            <img src="../img/poke-ball.png" alt="Pokémon Card Tracker Logo" width="35" height="35">
+            <span class="fw-bold fst-italic text-primary ms-2">Pokémon Card Tracker</span>
+        </a>
+    </header>
+
+    <!-- Registo Form -->
+    <main class="d-flex flex-column align-items-center">
+        <h1 class="text-center mb-4 text-primary fw-bold">Registo</h1>
+        <div class="form-container-login w-100" style="max-width: 400px;">
+            <form onsubmit="event.preventDefault(); saveFormData();">
+
+                <div id="password-warning" class="alert alert-danger d-none" role="alert">
+                    As passwords não coincidem. Por favor, tente novamente.
+                </div>
+
+                <!-- Nome Input -->
+                <div class="mb-3">
+                    <label for="nome" class="form-label">Nome<span class="text-danger">*</span></label>
+                    <input type="text" id="nome" class="form-control" placeholder="Insira o Nome" required autocomplete="off">
+                </div>
+
+                <!-- Email Input -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email<span class="text-danger">*</span></label>
+                    <input type="email" id="email" class="form-control" placeholder="Insira o Email" required autocomplete="off">
+                </div>
+
+                <!-- Password Input -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password<span class="text-danger">*</span></label>
+                    <input type="password" id="password" class="form-control" placeholder="Insira a Password" required autocomplete="off">
+                </div>
+
+                <!-- Repeat Password Input -->
+                <div class="mb-3">
+                    <label for="repeat-password" class="form-label">Repetir Password<span class="text-danger">*</span></label>
+                    <input type="password" id="repeat-password" class="form-control" placeholder="Repita a Password" required autocomplete="off">
+                </div>
+
+                <!-- Required Fields Note -->
+                <p class="text-muted small mb-4"><span class="text-danger">*</span> indica um campo obrigatório</p>
+
+                <div class="text-center">
+                    <button class="btn btn-primary w-100" type="submit" onclick="console.log('clicked')">Registar</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-primary text-white py-3 mt-auto">
+        <div class="container-fluid text-center">
+            <p class="small mb-0">Pokémon Card Tracker - 2025. All Rights Reserved</p>
+        </div>
+    </footer>
+    <script src="../scripts/local_storage_utils.js"></script>
+    <script src="../scripts/ErrorPopup.js" defer></script>
+    <script src="../scripts/Popup.js" defer></script>
+    <script src="../scripts/SaveRegisto.js" defer></script>
+</body>
+
+</html>

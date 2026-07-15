@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+    <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Pokémon Card Tracker</title>
+    <link
+      rel="shortcut icon"
+      type="image/x-icon"
+      href="../img/poke-ball.png"
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="../css/Style.css" />
+    <script src="../scripts/Tabs.js" defer></script>
+    <script src="../scripts/local_storage_utils.js" defer></script>
+    <script src="../scripts/perfil.js" defer></script>
+    </head>
+
+<body id="main">
+        <header class="py-3 w-100">
+            <img
+            src="../img/poke-ball.png"
+            alt="Pokémon Card Tracker Logo"
+            width="35"
+            height="35"
+            />
+            <span class="fw-bold fst-italic text-primary ms-2">Pokémon Card Tracker</span>
+        </header>
+
+        <button class="tablink" onclick="openPage('Pesquisa', this, 'red')" id="defaultOpen">Pesquisa</button>
+        <button class="tablink" onclick="openPage('Coleção', this, 'green')">Coleção</button>
+        <button class="tablink" onclick="openPage('ListaDesejos', this, 'blue')">Lista de Desejos</button>
+        <button class="tablink" onclick="openPage('Perfil', this, 'orange')">Perfil</button>
+
+        <div id="Pesquisa" class="tabcontent">
+            <h3>Pesquisa</h3>
+            <p>Procura por cartas Pokémon.</p>
+            <input type="text" id="searchInput" placeholder="Pesquisar cartas..." />
+
+            <div id="myBtnContainer">
+                    <button class="btn active" onclick="filterSelection(this, 'all')">
+                        Show all
+                    </button>
+
+                    <!-- Energia -->
+                    <div class="dropdown-item1">
+                        <button class="btn" onclick="toggleDropdown(this)">
+                            Energia
+                        </button>
+
+                        <div class="dropdown-content">
+                            <input type="text"
+                                placeholder="Procurar..."
+                                onkeyup="filterFunction(this)">
+
+                            <a href="#" onclick="filterSelection(this, 'grass')">Grass</a>
+                            <a href="#" onclick="filterSelection(this, 'fire')">Fire</a>
+                            <a href="#" onclick="filterSelection(this, 'water')">Water</a>
+                            <a href="#" onclick="filterSelection(this, 'lightning')">Lightning</a>
+                            <a href="#" onclick="filterSelection(this, 'psychic')">Psychic</a>
+                            <a href="#" onclick="filterSelection(this, 'fighting')">Fighting</a>
+                            <a href="#" onclick="filterSelection(this, 'darkness')">Darkness</a>
+                            <a href="#" onclick="filterSelection(this, 'metal')">Metal</a>
+                            <a href="#" onclick="filterSelection(this, 'fairy')">Fairy</a>
+                            <a href="#" onclick="filterSelection(this, 'dragon')">Dragon</a>
+                            <a href="#" onclick="filterSelection(this, 'colorless')">Colorless</a>
+                        </div>
+                    </div>
+
+                    <!-- Expansões -->
+                    <div class="dropdown-item1">
+                        <button class="btn" onclick="toggleDropdown(this)">
+                            Expansões
+                        </button>
+
+                        <div class="dropdown-content">
+                            <input type="text"
+                                placeholder="Procurar..."
+                                onkeyup="filterFunction(this)">
+
+                            <a href="#" onclick="filterSelection(this, 'Pitch Black')">Pitch Black</a>
+                            <a href="#" onclick="filterSelection(this, 'Chaos Rising')">Chaos Rising</a>
+                            <a href="#" onclick="filterSelection(this, 'Perfect Order')">Perfect Order</a>
+                            <a href="#" onclick="filterSelection(this, 'Ascended Heroes')">Ascended Heroes</a>
+                            <a href="#" onclick="filterSelection(this, 'Phantasmal Flames')">Phantasmal Flames</a>
+                            <a href="#" onclick="filterSelection(this, 'Mega Evolution')">Mega Evolution</a>
+                            <a href="#" onclick="filterSelection(this, 'Mega Evolution Promo Cards')">Mega Evolution Promo Cards</a>
+                            <a href="#" onclick="filterSelection(this, 'White Flare')">White Flare</a>
+                            <a href="#" onclick="filterSelection(this, 'Destined Rivals')">Destined Rivals</a>
+                            <a href="#" onclick="filterSelection(this, 'Journey Together')">Journey Together</a>
+                            <a href="#" onclick="filterSelection(this, 'Prismatic Evolutions')">Prismatic Evolutions</a>
+                            <a href="#" onclick="filterSelection(this, 'Surging Sparks')">Surging Sparks</a>
+                            <a href="#" onclick="filterSelection(this, 'Stellar Crown')">Stellar Crown</a>
+                            <a href="#" onclick="filterSelection(this, 'Shrouded Fable')">Shrouded Fable</a>
+                            <a href="#" onclick="filterSelection(this, 'Twilight Masquerade')">Twilight Masquerade</a>
+                            <a href="#" onclick="filterSelection(this, 'Temporal Forces')">Temporal Forces</a>
+                            <a href="#" onclick="filterSelection(this, 'Paldean Fates')">Paldean Fates</a>
+                            <a href="#" onclick="filterSelection(this, 'Paradox Rift')">Paradox Rift</a>
+                            <a href="#" onclick="filterSelection(this, '151')">151</a>
+                            <a href="#" onclick="filterSelection(this, 'Obsidian Flames')">Obsidian Flames</a>
+                            <a href="#" onclick="filterSelection(this, 'Paldea Evolved')">Paldea Evolved</a>
+                            <a href="#" onclick="filterSelection(this, 'Scarlet & Violet')">Scarlet & Violet</a>
+                            <a href="#" onclick="filterSelection(this, 'Scarlet & Violet Promo Cards')">Scarlet & Violet Promo Cards</a>
+                            <a href="#" onclick="filterSelection(this, 'Crown Zenith Galarian Gallery')">Crown Zenith Galarian Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Crown Zenith')">Crown Zenith</a>
+                            <a href="#" onclick="filterSelection(this, 'Silver Tempest: Trainer Gallery')">Silver Tempest: Trainer Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Silver Tempest')">Silver Tempest</a>
+                            <a href="#" onclick="filterSelection(this, 'Lost Origin Trainer Gallery')">Lost Origin Trainer Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Lost Origin')">Lost Origin</a>
+                            <a href="#" onclick="filterSelection(this, 'Pokémon TCG: Pokémon GO')">Pokémon TCG: Pokémon GO</a>
+                            <a href="#" onclick="filterSelection(this, 'Astral Radiance Trainer Gallery')">Astral Radiance Trainer Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Astral Radiance')">Astral Radiance</a>
+                            <a href="#" onclick="filterSelection(this, 'Brilliant Starts Trainer Gallery')">Brilliant Starts Trainer Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Brilliant Stars')">Brilliant Stars</a>
+                            <a href="#" onclick="filterSelection(this, 'Fusion Strike')">Fusion Strike</a>
+                            <a href="#" onclick="filterSelection(this, 'Celebrations: Classic Collection')">Celebrations: Classic Collection</a>
+                            <a href="#" onclick="filterSelection(this, 'Celebrations')">Celebrations</a>
+                            <a href="#" onclick="filterSelection(this, 'Evolving Skies')">Evolving Skies</a>
+                            <a href="#" onclick="filterSelection(this, 'Chilling Reign')">Chilling Reign</a>
+                            <a href="#" onclick="filterSelection(this, 'Battle Styles')">Battle Styles</a>
+                            <a href="#" onclick="filterSelection(this, 'Shining Fates: Shiny Vault')">Shining Fates: Shiny Vault</a>
+                            <a href="#" onclick="filterSelection(this, 'Shining Fates')">Shining Fates</a>
+                            <a href="#" onclick="filterSelection(this, 'Vivid Voltage')">Vivid Voltage</a>
+                            <a href="#" onclick="filterSelection(this, 'Champion\'s Path')">Champion's Path</a>
+                            <a href="#" onclick="filterSelection(this, 'Darkness Ablaze')">Darkness Ablaze</a>
+                            <a href="#" onclick="filterSelection(this, 'Rebel Clash')">Rebel Clash</a>
+                            <a href="#" onclick="filterSelection(this, 'Sword & Shield')">Sword & Shield</a>
+                            <a href="#" onclick="filterSelection(this, 'Sword & Shield Promo')">Sword & Shield Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'Cosmic Eclipse')">Cosmic Eclipse</a>
+                            <a href="#" onclick="filterSelection(this, 'Hidden Fates')">Hidden Fates</a>
+                            <a href="#" onclick="filterSelection(this, 'Unified Minds')">Unified Minds</a>
+                            <a href="#" onclick="filterSelection(this, 'Unbroken Bounds')">Unbroken Bounds</a>
+                            <a href="#" onclick="filterSelection(this, 'Detective Pikachu')">Detective Pikachu</a>
+                            <a href="#" onclick="filterSelection(this, 'Team Up')">Team Up</a>
+                            <a href="#" onclick="filterSelection(this, 'Lost Thunder')">Lost Thunder</a>
+                            <a href="#" onclick="filterSelection(this, 'Dragon Majesty')">Dragon Majesty</a>
+                            <a href="#" onclick="filterSelection(this, 'Celestial Storm')">Celestial Storm</a>
+                            <a href="#" onclick="filterSelection(this, 'Forbidden Light')">Forbidden Light</a>
+                            <a href="#" onclick="filterSelection(this, 'Ultra Prism')">Ultra Prism</a>
+                            <a href="#" onclick="filterSelection(this, 'Crimson Invasion')">Crimson Invasion</a>
+                            <a href="#" onclick="filterSelection(this, 'Shining Legends')">Shining Legends</a>
+                            <a href="#" onclick="filterSelection(this, 'Burning Shadows')">Burning Shadows</a>
+                            <a href="#" onclick="filterSelection(this, 'Guardians Rising')">Guardians Rising</a>
+                            <a href="#" onclick="filterSelection(this, 'Sun & Moon')">Sun & Moon</a>
+                            <a href="#" onclick="filterSelection(this, 'Yellow A Alternate')">Yellow A Alternate</a>
+                            <a href="#" onclick="filterSelection(this, 'Sun & Moon Promo')">Sun & Moon Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Evolutons')">XY-Evolutons</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Steam Siege')">XY-Steam Siege</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Fates Collide')">XY-Fates Collide</a>
+                            <a href="#" onclick="filterSelection(this, 'Generations')">Generations</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-BREAKpoint')">XY-BREAKpoint</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-BREAKthrough')">XY-BREAKthrough</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Ancient Origins')">XY-Ancient Origins</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Roaring Skies')">XY-Roaring Skies</a>
+                            <a href="#" onclick="filterSelection(this, 'Double Crisis')">Double Crisis</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Primal Clash')">XY-Primal Clash</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Phantom Forces')">XY-Phantom Forces</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Furious Fists')">XY-Furious Fists</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Flashfire')">XY-Flashfire</a>
+                            <a href="#" onclick="filterSelection(this, 'XY')">XY</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Kalos Starter Set')">XY-Kalos Starter Set</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Promo')">XY-Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Legendary Treasures')">BW-Legendary Treasures</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Plasma Blast')">BW-Plasma Blast</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Plasma Freeze')">BW-Plasma Freeze</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Plasma Storm')">BW-Plasma Storm</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Boundaries Crossed')">BW-Boundaries Crossed</a>
+                            <a href="#" onclick="filterSelection(this, 'Dragon Vault')">Dragon Vault</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Dragons Exalted')">BW-Dragons Exalted</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Dark Explorers')">BW-Dark Explorers</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Next Destinies')">BW-Next Destinies</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Noble Victories')">BW-Noble Victories</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Emerging Powers')">BW-Emerging Powers</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Black & White')">BW-Black & White</a>
+                            <a href="#" onclick="filterSelection(this, 'BW - Promo')">BW - Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'Call of Legends')">Call of Legends</a>
+                            <a href="#" onclick="filterSelection(this, 'Triumphant')">Triumphant</a>
+                            <a href="#" onclick="filterSelection(this, 'Undaunted')">Undaunted</a>
+                            <a href="#" onclick="filterSelection(this, 'Unleashed')">Unleashed</a>
+                            <a href="#" onclick="filterSelection(this, 'HeartGold SoulSilver')">HeartGold SoulSilver</a>
+                            <a href="#" onclick="filterSelection(this, 'HS-Promo')">HS-Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'Arceus')">Arceus</a>
+                            <a href="#" onclick="filterSelection(this, 'Supreme Victors')">Supreme Victors</a>
+                            <a href="#" onclick="filterSelection(this, 'Rising Rivals')">Rising Rivals</a>
+                            <a href="#" onclick="filterSelection(this, 'Platinum')">Platinum</a>
+                            <a href="#" onclick="filterSelection(this, 'Stormfront')">Stormfront</a>
+                            <a href="#" onclick="filterSelection(this, 'Legends Awakened')">Legends Awakened</a>
+                            <a href="#" onclick="filterSelection(this, 'Majestic Dawn')">Majestic Dawn</a>
+                            <a href="#" onclick="filterSelection(this, 'Great Encounters')">Great Encounters</a>
+                            <a href="#" onclick="filterSelection(this, 'Secret Wonders')">Secret Wonders</a>
+                            <a href="#" onclick="filterSelection(this, 'Mysterious Treasures')">Mysterious Treasures</a>
+                            <a href="#" onclick="filterSelection(this, 'Diamond & Pearl')">Diamond & Pearl</a>
+                            <a href="#" onclick="filterSelection(this, 'Power Keepers')">Power Keepers</a>
+                            <a href="#" onclick="filterSelection(this, 'Dragon Frontiers')">Dragon Frontiers</a>
+                            <a href="#" onclick="filterSelection(this, 'Crystal Guardians')">Crystal Guardians</a>
+                            <a href="#" onclick="filterSelection(this, 'Holon Phantoms')">Holon Phantoms</a>
+                            <a href="#" onclick="filterSelection(this, 'Legend Maker')">Legend Maker</a>
+                            <a href="#" onclick="filterSelection(this, 'Delta Species')">Delta Species</a>
+                            <a href="#" onclick="filterSelection(this, 'Unseen Forces')">Unseen Forces</a>
+                            <a href="#" onclick="filterSelection(this, 'Emerald')">Emerald</a>
+                            <a href="#" onclick="filterSelection(this, 'Deoxys')">Deoxys</a>
+                            <a href="#" onclick="filterSelection(this, 'Team Rocket Returns')">Team Rocket Returns</a>
+                            <a href="#" onclick="filterSelection(this, 'Fire Red & Leaf Green')">Fire Red & Leaf Green</a>
+                            <a href="#" onclick="filterSelection(this, 'Hidden Legends')">Hidden Legends</a>
+                            <a href="#" onclick="filterSelection(this, 'Team Magma vs. Team Aqua')">Team Magma vs. Team Aqua</a>
+                            <a href="#" onclick="filterSelection(this, 'Sandstorm')">Sandstorm</a>
+                            <a href="#" onclick="filterSelection(this, 'Dragon')">Dragon</a>
+                            <a href="#" onclick="filterSelection(this, 'Ruby & Sapphire')">Ruby & Sapphire</a>
+                        </div>
+                    </div>
+
+                    <!-- Outro -->
+                    <div class="dropdown-item1">
+                        <button class="btn" onclick="toggleDropdown(this)">
+                            ..
+                        </button>
+
+                        <div class="dropdown-content">
+                            <input type="text"
+                                placeholder="Procurar..."
+                                onkeyup="filterFunction(this)">
+
+                            <a href="#" onclick="filterSelection(this, 'a')">..</a>
+                            <a href="#" onclick="filterSelection(this, 'b')">..</a>
+                            <a href="#" onclick="filterSelection(this, 'c')">..</a>
+                        </div>
+                    </div>
+            </div>
+
+                <!-- Portfolio Gallery Grid -->
+                <div class="row">
+                <div class="column nature">
+                    <div class="content">
+                        <img src="/w3images/mountains.jpg" alt="Mountains" style="width:100%">
+                        <h4>Mountains</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column nature">
+                    <div class="content">
+                        <img src="/w3images/lights.jpg" alt="Lights" style="width:100%">
+                        <h4>Lights</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column nature">
+                    <div class="content">
+                        <img src="/w3images/nature.jpg" alt="Nature" style="width:100%">
+                        <h4>Forest</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+
+                <div class="column cars">
+                    <div class="content">
+                        <img src="/w3images/cars1.jpg" alt="Car" style="width:100%">
+                        <h4>Retro</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column cars">
+                    <div class="content">
+                        <img src="/w3images/cars2.jpg" alt="Car" style="width:100%">
+                        <h4>Fast</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column cars">
+                    <div class="content">
+                        <img src="/w3images/cars3.jpg" alt="Car" style="width:100%">
+                        <h4>Classic</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+
+                <div class="column people">
+                    <div class="content">
+                        <img src="/w3images/people1.jpg" alt="People" style="width:100%">
+                        <h4>Girl</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column people">
+                    <div class="content">
+                        <img src="/w3images/people2.jpg" alt="People" style="width:100%">
+                        <h4>Man</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column people">
+                    <div class="content">
+                        <img src="/w3images/people3.jpg" alt="People" style="width:100%">
+                        <h4>Woman</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <!-- END GRID -->
+                </div>
+        </div>
+
+        <div id="Coleção" class="tabcontent">
+            <h3>Coleção</h3>
+            <p>A tua Coleção de Cartas Pokémon.</p>
+            <input type="text" id="searchInput" placeholder="Pesquisar cartas na coleção..." />
+                <div id="myBtnContainer">
+                    <button class="btn active" onclick="filterSelection(this, 'all')">
+                        Show all
+                    </button>
+
+                    <!-- Energia -->
+                    <div class="dropdown-item1">
+                        <button class="btn" onclick="toggleDropdown(this)">
+                            Energia
+                        </button>
+
+                        <div class="dropdown-content">
+                            <input type="text"
+                                placeholder="Procurar..."
+                                onkeyup="filterFunction(this)">
+
+                            <a href="#" onclick="filterSelection(this, 'grass')">Grass</a>
+                            <a href="#" onclick="filterSelection(this, 'fire')">Fire</a>
+                            <a href="#" onclick="filterSelection(this, 'water')">Water</a>
+                            <a href="#" onclick="filterSelection(this, 'lightning')">Lightning</a>
+                            <a href="#" onclick="filterSelection(this, 'psychic')">Psychic</a>
+                            <a href="#" onclick="filterSelection(this, 'fighting')">Fighting</a>
+                            <a href="#" onclick="filterSelection(this, 'darkness')">Darkness</a>
+                            <a href="#" onclick="filterSelection(this, 'metal')">Metal</a>
+                            <a href="#" onclick="filterSelection(this, 'fairy')">Fairy</a>
+                            <a href="#" onclick="filterSelection(this, 'dragon')">Dragon</a>
+                            <a href="#" onclick="filterSelection(this, 'colorless')">Colorless</a>
+                        </div>
+                    </div>
+
+                    <!-- Expansões -->
+                    <div class="dropdown-item1">
+                        <button class="btn" onclick="toggleDropdown(this)">
+                            Expansões
+                        </button>
+
+                        <div class="dropdown-content">
+                            <input type="text"
+                                placeholder="Procurar..."
+                                onkeyup="filterFunction(this)">
+
+                            <a href="#" onclick="filterSelection(this, 'Pitch Black')">Pitch Black</a>
+                            <a href="#" onclick="filterSelection(this, 'Chaos Rising')">Chaos Rising</a>
+                            <a href="#" onclick="filterSelection(this, 'Perfect Order')">Perfect Order</a>
+                            <a href="#" onclick="filterSelection(this, 'Ascended Heroes')">Ascended Heroes</a>
+                            <a href="#" onclick="filterSelection(this, 'Phantasmal Flames')">Phantasmal Flames</a>
+                            <a href="#" onclick="filterSelection(this, 'Mega Evolution')">Mega Evolution</a>
+                            <a href="#" onclick="filterSelection(this, 'Mega Evolution Promo Cards')">Mega Evolution Promo Cards</a>
+                            <a href="#" onclick="filterSelection(this, 'White Flare')">White Flare</a>
+                            <a href="#" onclick="filterSelection(this, 'Destined Rivals')">Destined Rivals</a>
+                            <a href="#" onclick="filterSelection(this, 'Journey Together')">Journey Together</a>
+                            <a href="#" onclick="filterSelection(this, 'Prismatic Evolutions')">Prismatic Evolutions</a>
+                            <a href="#" onclick="filterSelection(this, 'Surging Sparks')">Surging Sparks</a>
+                            <a href="#" onclick="filterSelection(this, 'Stellar Crown')">Stellar Crown</a>
+                            <a href="#" onclick="filterSelection(this, 'Shrouded Fable')">Shrouded Fable</a>
+                            <a href="#" onclick="filterSelection(this, 'Twilight Masquerade')">Twilight Masquerade</a>
+                            <a href="#" onclick="filterSelection(this, 'Temporal Forces')">Temporal Forces</a>
+                            <a href="#" onclick="filterSelection(this, 'Paldean Fates')">Paldean Fates</a>
+                            <a href="#" onclick="filterSelection(this, 'Paradox Rift')">Paradox Rift</a>
+                            <a href="#" onclick="filterSelection(this, '151')">151</a>
+                            <a href="#" onclick="filterSelection(this, 'Obsidian Flames')">Obsidian Flames</a>
+                            <a href="#" onclick="filterSelection(this, 'Paldea Evolved')">Paldea Evolved</a>
+                            <a href="#" onclick="filterSelection(this, 'Scarlet & Violet')">Scarlet & Violet</a>
+                            <a href="#" onclick="filterSelection(this, 'Scarlet & Violet Promo Cards')">Scarlet & Violet Promo Cards</a>
+                            <a href="#" onclick="filterSelection(this, 'Crown Zenith Galarian Gallery')">Crown Zenith Galarian Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Crown Zenith')">Crown Zenith</a>
+                            <a href="#" onclick="filterSelection(this, 'Silver Tempest: Trainer Gallery')">Silver Tempest: Trainer Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Silver Tempest')">Silver Tempest</a>
+                            <a href="#" onclick="filterSelection(this, 'Lost Origin Trainer Gallery')">Lost Origin Trainer Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Lost Origin')">Lost Origin</a>
+                            <a href="#" onclick="filterSelection(this, 'Pokémon TCG: Pokémon GO')">Pokémon TCG: Pokémon GO</a>
+                            <a href="#" onclick="filterSelection(this, 'Astral Radiance Trainer Gallery')">Astral Radiance Trainer Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Astral Radiance')">Astral Radiance</a>
+                            <a href="#" onclick="filterSelection(this, 'Brilliant Starts Trainer Gallery')">Brilliant Starts Trainer Gallery</a>
+                            <a href="#" onclick="filterSelection(this, 'Brilliant Stars')">Brilliant Stars</a>
+                            <a href="#" onclick="filterSelection(this, 'Fusion Strike')">Fusion Strike</a>
+                            <a href="#" onclick="filterSelection(this, 'Celebrations: Classic Collection')">Celebrations: Classic Collection</a>
+                            <a href="#" onclick="filterSelection(this, 'Celebrations')">Celebrations</a>
+                            <a href="#" onclick="filterSelection(this, 'Evolving Skies')">Evolving Skies</a>
+                            <a href="#" onclick="filterSelection(this, 'Chilling Reign')">Chilling Reign</a>
+                            <a href="#" onclick="filterSelection(this, 'Battle Styles')">Battle Styles</a>
+                            <a href="#" onclick="filterSelection(this, 'Shining Fates: Shiny Vault')">Shining Fates: Shiny Vault</a>
+                            <a href="#" onclick="filterSelection(this, 'Shining Fates')">Shining Fates</a>
+                            <a href="#" onclick="filterSelection(this, 'Vivid Voltage')">Vivid Voltage</a>
+                            <a href="#" onclick="filterSelection(this, 'Champion\'s Path')">Champion's Path</a>
+                            <a href="#" onclick="filterSelection(this, 'Darkness Ablaze')">Darkness Ablaze</a>
+                            <a href="#" onclick="filterSelection(this, 'Rebel Clash')">Rebel Clash</a>
+                            <a href="#" onclick="filterSelection(this, 'Sword & Shield')">Sword & Shield</a>
+                            <a href="#" onclick="filterSelection(this, 'Sword & Shield Promo')">Sword & Shield Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'Cosmic Eclipse')">Cosmic Eclipse</a>
+                            <a href="#" onclick="filterSelection(this, 'Hidden Fates')">Hidden Fates</a>
+                            <a href="#" onclick="filterSelection(this, 'Unified Minds')">Unified Minds</a>
+                            <a href="#" onclick="filterSelection(this, 'Unbroken Bounds')">Unbroken Bounds</a>
+                            <a href="#" onclick="filterSelection(this, 'Detective Pikachu')">Detective Pikachu</a>
+                            <a href="#" onclick="filterSelection(this, 'Team Up')">Team Up</a>
+                            <a href="#" onclick="filterSelection(this, 'Lost Thunder')">Lost Thunder</a>
+                            <a href="#" onclick="filterSelection(this, 'Dragon Majesty')">Dragon Majesty</a>
+                            <a href="#" onclick="filterSelection(this, 'Celestial Storm')">Celestial Storm</a>
+                            <a href="#" onclick="filterSelection(this, 'Forbidden Light')">Forbidden Light</a>
+                            <a href="#" onclick="filterSelection(this, 'Ultra Prism')">Ultra Prism</a>
+                            <a href="#" onclick="filterSelection(this, 'Crimson Invasion')">Crimson Invasion</a>
+                            <a href="#" onclick="filterSelection(this, 'Shining Legends')">Shining Legends</a>
+                            <a href="#" onclick="filterSelection(this, 'Burning Shadows')">Burning Shadows</a>
+                            <a href="#" onclick="filterSelection(this, 'Guardians Rising')">Guardians Rising</a>
+                            <a href="#" onclick="filterSelection(this, 'Sun & Moon')">Sun & Moon</a>
+                            <a href="#" onclick="filterSelection(this, 'Yellow A Alternate')">Yellow A Alternate</a>
+                            <a href="#" onclick="filterSelection(this, 'Sun & Moon Promo')">Sun & Moon Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Evolutons')">XY-Evolutons</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Steam Siege')">XY-Steam Siege</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Fates Collide')">XY-Fates Collide</a>
+                            <a href="#" onclick="filterSelection(this, 'Generations')">Generations</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-BREAKpoint')">XY-BREAKpoint</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-BREAKthrough')">XY-BREAKthrough</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Ancient Origins')">XY-Ancient Origins</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Roaring Skies')">XY-Roaring Skies</a>
+                            <a href="#" onclick="filterSelection(this, 'Double Crisis')">Double Crisis</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Primal Clash')">XY-Primal Clash</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Phantom Forces')">XY-Phantom Forces</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Furious Fists')">XY-Furious Fists</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Flashfire')">XY-Flashfire</a>
+                            <a href="#" onclick="filterSelection(this, 'XY')">XY</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Kalos Starter Set')">XY-Kalos Starter Set</a>
+                            <a href="#" onclick="filterSelection(this, 'XY-Promo')">XY-Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Legendary Treasures')">BW-Legendary Treasures</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Plasma Blast')">BW-Plasma Blast</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Plasma Freeze')">BW-Plasma Freeze</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Plasma Storm')">BW-Plasma Storm</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Boundaries Crossed')">BW-Boundaries Crossed</a>
+                            <a href="#" onclick="filterSelection(this, 'Dragon Vault')">Dragon Vault</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Dragons Exalted')">BW-Dragons Exalted</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Dark Explorers')">BW-Dark Explorers</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Next Destinies')">BW-Next Destinies</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Noble Victories')">BW-Noble Victories</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Emerging Powers')">BW-Emerging Powers</a>
+                            <a href="#" onclick="filterSelection(this, 'BW-Black & White')">BW-Black & White</a>
+                            <a href="#" onclick="filterSelection(this, 'BW - Promo')">BW - Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'Call of Legends')">Call of Legends</a>
+                            <a href="#" onclick="filterSelection(this, 'Triumphant')">Triumphant</a>
+                            <a href="#" onclick="filterSelection(this, 'Undaunted')">Undaunted</a>
+                            <a href="#" onclick="filterSelection(this, 'Unleashed')">Unleashed</a>
+                            <a href="#" onclick="filterSelection(this, 'HeartGold SoulSilver')">HeartGold SoulSilver</a>
+                            <a href="#" onclick="filterSelection(this, 'HS-Promo')">HS-Promo</a>
+                            <a href="#" onclick="filterSelection(this, 'Arceus')">Arceus</a>
+                            <a href="#" onclick="filterSelection(this, 'Supreme Victors')">Supreme Victors</a>
+                            <a href="#" onclick="filterSelection(this, 'Rising Rivals')">Rising Rivals</a>
+                            <a href="#" onclick="filterSelection(this, 'Platinum')">Platinum</a>
+                            <a href="#" onclick="filterSelection(this, 'Stormfront')">Stormfront</a>
+                            <a href="#" onclick="filterSelection(this, 'Legends Awakened')">Legends Awakened</a>
+                            <a href="#" onclick="filterSelection(this, 'Majestic Dawn')">Majestic Dawn</a>
+                            <a href="#" onclick="filterSelection(this, 'Great Encounters')">Great Encounters</a>
+                            <a href="#" onclick="filterSelection(this, 'Secret Wonders')">Secret Wonders</a>
+                            <a href="#" onclick="filterSelection(this, 'Mysterious Treasures')">Mysterious Treasures</a>
+                            <a href="#" onclick="filterSelection(this, 'Diamond & Pearl')">Diamond & Pearl</a>
+                            <a href="#" onclick="filterSelection(this, 'Power Keepers')">Power Keepers</a>
+                            <a href="#" onclick="filterSelection(this, 'Dragon Frontiers')">Dragon Frontiers</a>
+                            <a href="#" onclick="filterSelection(this, 'Crystal Guardians')">Crystal Guardians</a>
+                            <a href="#" onclick="filterSelection(this, 'Holon Phantoms')">Holon Phantoms</a>
+                            <a href="#" onclick="filterSelection(this, 'Legend Maker')">Legend Maker</a>
+                            <a href="#" onclick="filterSelection(this, 'Delta Species')">Delta Species</a>
+                            <a href="#" onclick="filterSelection(this, 'Unseen Forces')">Unseen Forces</a>
+                            <a href="#" onclick="filterSelection(this, 'Emerald')">Emerald</a>
+                            <a href="#" onclick="filterSelection(this, 'Deoxys')">Deoxys</a>
+                            <a href="#" onclick="filterSelection(this, 'Team Rocket Returns')">Team Rocket Returns</a>
+                            <a href="#" onclick="filterSelection(this, 'Fire Red & Leaf Green')">Fire Red & Leaf Green</a>
+                            <a href="#" onclick="filterSelection(this, 'Hidden Legends')">Hidden Legends</a>
+                            <a href="#" onclick="filterSelection(this, 'Team Magma vs. Team Aqua')">Team Magma vs. Team Aqua</a>
+                            <a href="#" onclick="filterSelection(this, 'Sandstorm')">Sandstorm</a>
+                            <a href="#" onclick="filterSelection(this, 'Dragon')">Dragon</a>
+                            <a href="#" onclick="filterSelection(this, 'Ruby & Sapphire')">Ruby & Sapphire</a>
+                        </div>
+                    </div>
+
+                    <!-- Outro -->
+                    <div class="dropdown-item1">
+                        <button class="btn" onclick="toggleDropdown(this)">
+                            ..
+                        </button>
+
+                        <div class="dropdown-content">
+                            <input type="text"
+                                placeholder="Procurar..."
+                                onkeyup="filterFunction(this)">
+
+                            <a href="#" onclick="filterSelection(this, 'a')">..</a>
+                            <a href="#" onclick="filterSelection(this, 'b')">..</a>
+                            <a href="#" onclick="filterSelection(this, 'c')">..</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Gallery Grid -->
+                <div class="row">
+                <div class="column nature">
+                    <div class="content">
+                        <img src="/w3images/mountains.jpg" alt="Mountains" style="width:100%">
+                        <h4>Mountains</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column nature">
+                    <div class="content">
+                        <img src="/w3images/lights.jpg" alt="Lights" style="width:100%">
+                        <h4>Lights</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column nature">
+                    <div class="content">
+                        <img src="/w3images/nature.jpg" alt="Nature" style="width:100%">
+                        <h4>Forest</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+
+                <div class="column cars">
+                    <div class="content">
+                        <img src="/w3images/cars1.jpg" alt="Car" style="width:100%">
+                        <h4>Retro</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column cars">
+                    <div class="content">
+                        <img src="/w3images/cars2.jpg" alt="Car" style="width:100%">
+                        <h4>Fast</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column cars">
+                    <div class="content">
+                        <img src="/w3images/cars3.jpg" alt="Car" style="width:100%">
+                        <h4>Classic</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+
+                <div class="column people">
+                    <div class="content">
+                        <img src="/w3images/people1.jpg" alt="People" style="width:100%">
+                        <h4>Girl</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column people">
+                    <div class="content">
+                        <img src="/w3images/people2.jpg" alt="People" style="width:100%">
+                        <h4>Man</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <div class="column people">
+                    <div class="content">
+                        <img src="/w3images/people3.jpg" alt="People" style="width:100%">
+                        <h4>Woman</h4>
+                        <p>Lorem ipsum dolor..</p>
+                    </div>
+                </div>
+                <!-- END GRID -->
+                </div>
+        </div>
+
+        <div id="ListaDesejos" class="tabcontent">
+            <h3>Lista de Desejos</h3>
+            <p>Procura por cartas Pokémon.</p>
+            <input type="text" id="searchInput" placeholder="Pesquisar cartas..." />
+
+            <div id="myBtnContainer">
+                    <button class="btn active" onclick="filterSelection(this, 'all')">
+                        Show all
+                    </button>
+
+                    <!-- Energia -->
+                    <div class="dropdown-item1">
+                        <button class="btn" onclick="toggleDropdown(this)">
+                            Energia
+                        </button>
+
+                        <div class="dropdown-content">
+                            <input type="text"
+                                placeholder="Procurar..."
+                                onkeyup="filterFunction(this)">
+
+                            <a href="#" onclick="filterSelection(this, 'grass')">Grass</a>
+                            <a href="#" onclick="filterSelection(this, 'fire')">Fire</a>
+                            <a href="#" onclick="filterSelection(this, 'water')">Water</a>
+                            <a href="#" onclick="filterSelection(this, 'lightning')">Lightning</a>
+                            <a href="#" onclick="filterSelection(this, 'psychic')">Psychic</a>
+                            <a href="#" onclick="filterSelection(this, 'fighting')">Fighting</a>
+                            <a href="#" onclick="filterSelection(this, 'darkness')">Darkness</a>
+                            <a href="#" onclick="filterSelection(this, 'metal')">Metal</a>
+                            <a href="#" onclick="filterSelection(this, 'fairy')">Fairy</a>
+                            <a href="#" onclick="filterSelection(this, 'dragon')">Dragon</a>
+                            <a href="#" onclick="filterSelection(this, 'colorless')">Colorless</a>
+                        </div>
+                    </div>
+
+                    <!-- Expansões -->
+                    <div class="dropdown-item1">
+                        <button class="btn" onclick="toggleDropdown(this)">
+                            Expansões
+                        </button>
+
+                        <div class="dropdown-content">
+                            <input type="text"
+                                placeholder="Procurar..."
+                                onkeyup="filterFunction(this)">
+
+                            <div id="expansionFilters"></div>
+
+                        </div>
+                    </div>
+
+                    <!-- Outro -->
+                    <div class="dropdown-item1">
+                        <button class="btn" onclick="toggleDropdown(this)">
+                            ..
+                        </button>
+
+                        <div class="dropdown-content">
+                            <input type="text"
+                                placeholder="Procurar..."
+                                onkeyup="filterFunction(this)">
+
+                            <a href="#" onclick="filterSelection(this, 'a')">..</a>
+                            <a href="#" onclick="filterSelection(this, 'b')">..</a>
+                            <a href="#" onclick="filterSelection(this, 'c')">..</a>
+                        </div>
+                    </div>
+            </div>
+            <!-- Portfolio Gallery Grid -->
+                <div class="row" id="cardContainer">
+                </div>
+        </div>
+
+
+        <div id="Perfil" class="tabcontent">
+            <h3>Perfil</h3>
+            <p>Edita o teu perfil.</p>
+            <div class="container">
+                <label for="profileName"><b>Nome</b></label>
+                <input type="text" id="profileName">
+
+                <label for="profileEmail"><b>Email</b></label>
+                <input type="email" id="profileEmail">
+
+                <button id="saveProfile" class="btn">
+                    Guardar alterações
+                </button>
+
+                <button id="logoutButton" class="btn">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </body>
+    </main>
+    
+</html>
