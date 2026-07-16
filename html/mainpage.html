@@ -18,8 +18,10 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="../css/Style.css" />
+    <script src="../scripts/ErrorPopup.js" defer></script>
+    <script src="../scripts/Popup.js" defer></script>
+    <script src="../scripts/api_client.js" defer></script>
     <script src="../scripts/Tabs.js" defer></script>
-    <script src="../scripts/local_storage_utils.js" defer></script>
     <script src="../scripts/perfil.js" defer></script>
     </head>
 
@@ -143,6 +145,36 @@
                 <button id="logoutButton" class="btn">
                     Logout
                 </button>
+
+                <div class="profile-stats">
+                    <h4>Estatisticas</h4>
+                    <div class="profile-stats-grid">
+                        <div>
+                            <span>Total de cartas</span>
+                            <strong id="statTotalCards">0</strong>
+                        </div>
+                        <div>
+                            <span>Cartas unicas</span>
+                            <strong id="statUniqueCards">0</strong>
+                        </div>
+                        <div>
+                            <span>Valor investido</span>
+                            <strong id="statTotalInvested">0,00 €</strong>
+                        </div>
+                        <div>
+                            <span>Preco medio</span>
+                            <strong id="statAveragePrice">0,00 €</strong>
+                        </div>
+                        <div>
+                            <span>Cartas na wishlist</span>
+                            <strong id="statWishlistCards">0</strong>
+                        </div>
+                        <div>
+                            <span>Expansao principal</span>
+                            <strong id="statTopExpansion">Sem cartas</strong>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </body>

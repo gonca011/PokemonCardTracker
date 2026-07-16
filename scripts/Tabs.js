@@ -5,9 +5,21 @@ const CARDS_BASE_PATH = "../cards/";
 let currentCards = [];
 let pokemonIndexReady = null;
 let pokemonNameMatchers = [];
+let userCollection = [];
+let userWishlist = [];
 
 const cardsByContainer = new WeakMap();
 const tabStates = new WeakMap();
+const userDataUpdatedEventName = "pokemon:user-data-updated";
+const collectionStates = [
+  "Near Mint",
+  "Excellent",
+  "Good",
+  "Light Played",
+  "Played",
+  "Poor",
+];
+const wishlistPriorities = ["baixa", "media", "alta"];
 
 function openPage(pageName, elmnt, color) {
   const tabcontent = document.getElementsByClassName("tabcontent");
@@ -125,6 +137,59 @@ function getFilterClass(value) {
 
 function encodePathSegment(value) {
   return encodeURIComponent(value);
+}
+
+function createStableIdPart(value) {
+  return normalizeSearchText(value)
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "sem-id";
+}
+
+function createStableCardId(card) {
+  const expansion = card.expansion || card.expansao || "";
+  const identity = card.cardNumber || card.image || card.imagem || card.name || card.nome || "";
+
+  return `${createStableIdPart(expansion)}-${createStableIdPart(identity)}`;
+}
+
+function createStoredImagePath(expansion, image) {
+  const imagePath = String(image || "").replace(/\\/g, "/");
+
+  if (!imagePath) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(imagePath)) {
+    return imagePath;
+  }
+
+  if (imagePath.startsWith("../")) {
+    return imagePath.replace(/^\.\.\//, "");
+  }
+
+  if (imagePath.startsWith("cards/")) {
+    return imagePath;
+  }
+
+  return `cards/${expansion}/${imagePath}`;
+}
+
+function getImageUrl(card) {
+  const image = card.image || card.imagem || "";
+
+  if (/^https?:\/\//i.test(image)) {
+    return image;
+  }
+
+  if (image.startsWith("../")) {
+    return image;
+  }
+
+  if (image.startsWith("cards/")) {
+    return `../${image}`;
+  }
+
+  return `${CARDS_BASE_PATH}${encodePathSegment(card.expansion)}/${encodePathSegment(image)}`;
 }
 
 function escapeRegExp(value) {
@@ -367,23 +432,24 @@ function getBasePokemonData(cardName) {
 
 function createExpansionFilters(container, expansions) {
   container.innerHTML = "";
+  container.appendChild(createExpansionFilter("Todas", "all"));
 
   expansions.forEach((expansion) => {
     container.appendChild(createExpansionFilter(expansion));
   });
 }
 
-function createExpansionFilter(expansion) {
+function createExpansionFilter(expansion, filterValue = expansion) {
   const link = document.createElement("a");
 
   link.href = "#";
   link.textContent = expansion;
-  link.dataset.expansion = expansion;
-  link.dataset.filter = getFilterClass(expansion);
+  link.dataset.expansion = filterValue;
+  link.dataset.filter = filterValue === "all" ? "all" : getFilterClass(filterValue);
 
   link.addEventListener("click", function (event) {
     event.preventDefault();
-    selectExpansion(this, expansion);
+    selectExpansion(this, filterValue);
   });
 
   return link;
@@ -394,7 +460,13 @@ function selectExpansion(element, expansion) {
 
   setActiveFilter(scope, expansion);
   closeAllDropdowns();
-  loadCards(expansion, getCardContainer(element));
+
+  if (scope?.id === "Pesquisa" && expansion !== "all") {
+    loadCards(expansion, getCardContainer(element));
+    return;
+  }
+
+  applyFilters(scope);
 }
 
 function getCardContainer(element) {
@@ -426,6 +498,7 @@ async function loadCards(expansion, container = document.getElementById("cardCon
 
     storeCards(container, cards);
     renderCards(container, cards);
+    updateSearchActionStates();
   } catch (error) {
     console.error(`Erro ao carregar cartas de ${expansion}:`, error);
     storeCards(container, []);
@@ -464,7 +537,7 @@ function createCardModel(cardEntry, expansion) {
   const name = cardEntry.name || parsedCard.name;
   const pokemonData = getBasePokemonData(name);
 
-  return {
+  const card = {
     name,
     image,
     expansion: cardEntry.expansion || expansion,
@@ -476,13 +549,18 @@ function createCardModel(cardEntry, expansion) {
     spriteId: pokemonData.spriteId,
     types: getCardTypes(cardEntry),
   };
+
+  card.cardId = cardEntry.cardId || createStableCardId(card);
+  card.imagem = createStoredImagePath(card.expansion, card.image);
+
+  return card;
 }
 
 function createCardModelFromFileName(fileName, expansion) {
   const parsedCard = parseCardFileName(fileName, expansion);
   const pokemonData = getBasePokemonData(parsedCard.name);
 
-  return {
+  const card = {
     name: parsedCard.name,
     image: fileName,
     expansion,
@@ -494,6 +572,11 @@ function createCardModelFromFileName(fileName, expansion) {
     spriteId: pokemonData.spriteId,
     types: [],
   };
+
+  card.cardId = createStableCardId(card);
+  card.imagem = createStoredImagePath(card.expansion, card.image);
+
+  return card;
 }
 
 function parseCardFileName(fileName, expansion) {
@@ -554,6 +637,174 @@ function getCardTypes(card) {
   return [];
 }
 
+function getCollectionScope() {
+  return Array.from(document.querySelectorAll(".tabcontent")).find((tab) =>
+    tab.id.toLowerCase().startsWith("cole")
+  );
+}
+
+function getWishlistScope() {
+  return document.getElementById("ListaDesejos");
+}
+
+function getScopeContainer(scope) {
+  return scope?.querySelector(".cardContainer") || null;
+}
+
+function createCollectionCardModel(entry) {
+  const pokemonData = getBasePokemonData(entry.nome);
+
+  return {
+    kind: "collection",
+    cardId: entry.cardId,
+    name: entry.nome,
+    image: entry.imagem,
+    expansion: entry.expansao,
+    searchName: normalizeCardSearchText(entry.nome),
+    cardNumber: "",
+    setSize: "",
+    pokemonName: pokemonData.pokemonName,
+    pokemonSearchName: pokemonData.pokemonSearchName,
+    spriteId: pokemonData.spriteId,
+    types: [],
+    collectionData: entry,
+  };
+}
+
+function createWishlistCardModel(entry) {
+  const pokemonData = getBasePokemonData(entry.nome);
+
+  return {
+    kind: "wishlist",
+    cardId: entry.cardId,
+    name: entry.nome,
+    image: entry.imagem,
+    expansion: entry.expansao,
+    searchName: normalizeCardSearchText(entry.nome),
+    cardNumber: "",
+    setSize: "",
+    pokemonName: pokemonData.pokemonName,
+    pokemonSearchName: pokemonData.pokemonSearchName,
+    spriteId: pokemonData.spriteId,
+    types: [],
+    wishlistData: entry,
+  };
+}
+
+function renderUserCollection() {
+  const container = getScopeContainer(getCollectionScope());
+
+  if (!container) {
+    return;
+  }
+
+  const cards = userCollection.map(createCollectionCardModel);
+
+  storeCards(container, cards);
+
+  if (cards.length === 0) {
+    showCardMessage(container, "Ainda nao tens cartas na colecao.");
+    return;
+  }
+
+  renderCards(container, cards);
+}
+
+function renderUserWishlist() {
+  const container = getScopeContainer(getWishlistScope());
+
+  if (!container) {
+    return;
+  }
+
+  const cards = userWishlist.map(createWishlistCardModel);
+
+  storeCards(container, cards);
+
+  if (cards.length === 0) {
+    showCardMessage(container, "Ainda nao tens cartas na wishlist.");
+    return;
+  }
+
+  renderCards(container, cards);
+}
+
+function notifyUserDataUpdated() {
+  document.dispatchEvent(new CustomEvent(userDataUpdatedEventName));
+}
+
+async function loadUserLists() {
+  const user = PokemonApi.getAuthenticatedUser();
+
+  if (!user?.id) {
+    return;
+  }
+
+  const collectionContainer = getScopeContainer(getCollectionScope());
+  const wishlistContainer = getScopeContainer(getWishlistScope());
+
+  if (collectionContainer) {
+    showCardMessage(collectionContainer, "A carregar colecao...");
+  }
+
+  if (wishlistContainer) {
+    showCardMessage(wishlistContainer, "A carregar wishlist...");
+  }
+
+  try {
+    await loadPokemonIndex();
+
+    const [collection, wishlist] = await Promise.all([
+      PokemonApi.getCollection(user.id),
+      PokemonApi.getWishlist(user.id),
+    ]);
+
+    userCollection = collection;
+    userWishlist = wishlist;
+
+    renderUserCollection();
+    renderUserWishlist();
+    updateSearchActionStates();
+    notifyUserDataUpdated();
+  } catch (error) {
+    console.error("Erro ao carregar dados do utilizador:", error);
+
+    if (collectionContainer) {
+      showCardMessage(collectionContainer, "Nao foi possivel carregar a colecao.");
+    }
+
+    if (wishlistContainer) {
+      showCardMessage(wishlistContainer, "Nao foi possivel carregar a wishlist.");
+    }
+  }
+}
+
+async function refreshCollection() {
+  const user = PokemonApi.getAuthenticatedUser();
+
+  if (!user?.id) {
+    return;
+  }
+
+  userCollection = await PokemonApi.getCollection(user.id);
+  renderUserCollection();
+  updateSearchActionStates();
+  notifyUserDataUpdated();
+}
+
+async function refreshWishlist() {
+  const user = PokemonApi.getAuthenticatedUser();
+
+  if (!user?.id) {
+    return;
+  }
+
+  userWishlist = await PokemonApi.getWishlist(user.id);
+  renderUserWishlist();
+  updateSearchActionStates();
+  notifyUserDataUpdated();
+}
+
 function renderCards(container, cards) {
   const scope = getTabScope(container);
 
@@ -574,7 +825,11 @@ function renderCards(container, cards) {
 }
 
 function shouldGroupCards(scope) {
-  return ["Pesquisa", "Coleção", "ListaDesejos"].includes(scope?.id);
+  return (
+    scope?.id === "Pesquisa" ||
+    scope?.id === "ListaDesejos" ||
+    scope?.id?.toLowerCase().startsWith("cole")
+  );
 }
 
 function renderFlatCards(container, cards) {
@@ -655,14 +910,165 @@ function createPokemonGroupHeader(group) {
   return header;
 }
 
+const cardCurrencyFormatter = new Intl.NumberFormat("pt-PT", {
+  style: "currency",
+  currency: "EUR",
+});
+
+const cardDateFormatter = new Intl.DateTimeFormat("pt-PT", {
+  dateStyle: "short",
+  timeStyle: "short",
+});
+
+function formatCurrency(value) {
+  return cardCurrencyFormatter.format(Number(value || 0));
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  return cardDateFormatter.format(new Date(value));
+}
+
+function appendMetaItem(list, label, value) {
+  const term = document.createElement("dt");
+  const description = document.createElement("dd");
+
+  term.textContent = label;
+  description.textContent = value || "-";
+  list.appendChild(term);
+  list.appendChild(description);
+}
+
+function createCardMeta(card) {
+  const list = document.createElement("dl");
+
+  list.className = "card-meta";
+  appendMetaItem(list, "Expansao", card.expansion);
+
+  if (card.kind === "collection") {
+    appendMetaItem(list, "Preco compra", formatCurrency(card.collectionData.preco_compra));
+    appendMetaItem(list, "Data registo", formatDate(card.collectionData.data_registo));
+    appendMetaItem(list, "Quantidade", card.collectionData.quantidade);
+    appendMetaItem(list, "Estado", card.collectionData.estado || "Sem estado");
+    return list;
+  }
+
+  if (card.kind === "wishlist") {
+    appendMetaItem(list, "Preco alvo", formatCurrency(card.wishlistData.preco_alvo));
+    appendMetaItem(list, "Prioridade", card.wishlistData.prioridade);
+    appendMetaItem(list, "Data adicao", formatDate(card.wishlistData.data_adicao));
+    return list;
+  }
+
+  if (card.cardNumber) {
+    appendMetaItem(list, "Numero", card.setSize ? `${card.cardNumber}/${card.setSize}` : card.cardNumber);
+  }
+
+  return list;
+}
+
+function isCardInCollection(cardId) {
+  return userCollection.some((card) => card.cardId === cardId);
+}
+
+function isCardInWishlist(cardId) {
+  return userWishlist.some((card) => card.cardId === cardId);
+}
+
+function createActionButton(label, onClick, options = {}) {
+  const button = document.createElement("button");
+
+  button.type = "button";
+  button.className = options.className || "card-action-btn";
+  button.textContent = label;
+  button.disabled = Boolean(options.disabled);
+
+  if (options.action) {
+    button.dataset.action = options.action;
+  }
+
+  button.addEventListener("click", onClick);
+
+  return button;
+}
+
+function createCardActions(card) {
+  const actions = document.createElement("div");
+
+  actions.className = "card-actions";
+
+  if (card.kind === "collection") {
+    actions.appendChild(createActionButton("Editar", () => openCollectionModal(card, card.collectionData)));
+    actions.appendChild(
+      createActionButton("Remover", () => removeCollectionCard(card), {
+        className: "card-action-btn danger",
+      })
+    );
+    return actions;
+  }
+
+  if (card.kind === "wishlist") {
+    actions.appendChild(createActionButton("Editar", () => openWishlistModal(card, card.wishlistData)));
+    actions.appendChild(
+      createActionButton("Remover", () => removeWishlistCard(card), {
+        className: "card-action-btn danger",
+      })
+    );
+    return actions;
+  }
+
+  actions.appendChild(
+    createActionButton("Colecao", () => openCollectionModal(card), {
+      action: "add-collection",
+      disabled: isCardInCollection(card.cardId),
+    })
+  );
+  actions.appendChild(
+    createActionButton("Wishlist", () => openWishlistModal(card), {
+      action: "add-wishlist",
+      disabled: isCardInWishlist(card.cardId),
+    })
+  );
+
+  return actions;
+}
+
+function updateSearchActionStates() {
+  document.querySelectorAll('.pokemon-card[data-kind="search"]').forEach((cardElement) => {
+    const cardId = cardElement.dataset.cardId;
+    const collectionButton = cardElement.querySelector('[data-action="add-collection"]');
+    const wishlistButton = cardElement.querySelector('[data-action="add-wishlist"]');
+
+    if (collectionButton) {
+      const exists = isCardInCollection(cardId);
+
+      collectionButton.disabled = exists;
+      collectionButton.textContent = exists ? "Na colecao" : "Colecao";
+    }
+
+    if (wishlistButton) {
+      const exists = isCardInWishlist(cardId);
+
+      wishlistButton.disabled = exists;
+      wishlistButton.textContent = exists ? "Na wishlist" : "Wishlist";
+    }
+  });
+}
+
 function createCardElement(card) {
   const column = document.createElement("div");
   const content = document.createElement("div");
   const image = document.createElement("img");
   const title = document.createElement("h4");
   const expansionClass = getFilterClass(card.expansion);
+  const kind = card.kind || "search";
 
   column.classList.add("column", "show", "pokemon-card", "card-item", expansionClass);
+  column.dataset.kind = kind;
+  column.dataset.cardId = card.cardId;
   column.dataset.name = card.searchName;
   column.dataset.image = card.image;
   column.dataset.expansion = normalizeSearchText(card.expansion);
@@ -671,12 +1077,12 @@ function createCardElement(card) {
   column.dataset.setSize = card.setSize;
   column.dataset.pokemonName = card.pokemonSearchName;
 
-  card.types.forEach((type) => {
+  (card.types || []).forEach((type) => {
     column.classList.add(getFilterClass(type));
   });
 
   content.className = "content card-content";
-  image.src = `${CARDS_BASE_PATH}${encodePathSegment(card.expansion)}/${encodePathSegment(card.image)}`;
+  image.src = getImageUrl(card);
   image.alt = card.name;
   image.loading = "lazy";
   title.className = "card-title";
@@ -684,9 +1090,268 @@ function createCardElement(card) {
 
   content.appendChild(image);
   content.appendChild(title);
+  content.appendChild(createCardMeta(card));
+  content.appendChild(createCardActions(card));
   column.appendChild(content);
 
   return column;
+}
+
+function closeModal(overlay) {
+  overlay.remove();
+}
+
+function createFieldElement(field) {
+  const wrapper = document.createElement("label");
+  const label = document.createElement("span");
+  let input;
+
+  wrapper.className = "modal-field";
+  label.textContent = field.label;
+
+  if (field.type === "select") {
+    input = document.createElement("select");
+
+    field.options.forEach((optionValue) => {
+      const option = document.createElement("option");
+
+      option.value = optionValue;
+      option.textContent = optionValue;
+      input.appendChild(option);
+    });
+  } else if (field.type === "textarea") {
+    input = document.createElement("textarea");
+    input.rows = field.rows || 3;
+  } else {
+    input = document.createElement("input");
+    input.type = field.type || "text";
+  }
+
+  input.name = field.name;
+  input.value = field.value ?? "";
+  input.required = Boolean(field.required);
+
+  if (field.min !== undefined) {
+    input.min = field.min;
+  }
+
+  if (field.step !== undefined) {
+    input.step = field.step;
+  }
+
+  wrapper.appendChild(label);
+  wrapper.appendChild(input);
+
+  return wrapper;
+}
+
+function openCardModal(title, fields, onSubmit) {
+  const overlay = document.createElement("div");
+  const dialog = document.createElement("div");
+  const heading = document.createElement("h3");
+  const form = document.createElement("form");
+  const actions = document.createElement("div");
+  const cancelButton = document.createElement("button");
+  const submitButton = document.createElement("button");
+
+  overlay.className = "modal-overlay";
+  dialog.className = "card-modal";
+  heading.textContent = title;
+  actions.className = "modal-actions";
+  cancelButton.type = "button";
+  cancelButton.className = "btn";
+  cancelButton.textContent = "Cancelar";
+  submitButton.type = "submit";
+  submitButton.className = "btn btn-primary";
+  submitButton.textContent = "Guardar";
+
+  fields.forEach((field) => {
+    form.appendChild(createFieldElement(field));
+  });
+
+  cancelButton.addEventListener("click", () => closeModal(overlay));
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      closeModal(overlay);
+    }
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const values = Object.fromEntries(new FormData(form).entries());
+
+    submitButton.disabled = true;
+
+    try {
+      await onSubmit(values);
+      closeModal(overlay);
+    } catch (error) {
+      showErrorPopup(error.message || "Nao foi possivel guardar a carta.");
+      submitButton.disabled = false;
+    }
+  });
+
+  actions.appendChild(cancelButton);
+  actions.appendChild(submitButton);
+  form.appendChild(actions);
+  dialog.appendChild(heading);
+  dialog.appendChild(form);
+  overlay.appendChild(dialog);
+  document.body.appendChild(overlay);
+}
+
+function buildBaseCardPayload(card) {
+  return {
+    cardId: card.cardId,
+    nome: card.name,
+    expansao: card.expansion,
+    imagem: card.imagem || createStoredImagePath(card.expansion, card.image),
+  };
+}
+
+function openCollectionModal(card, existingCard = null) {
+  const isEdit = Boolean(existingCard);
+
+  openCardModal(
+    isEdit ? `Editar ${card.name}` : `Adicionar ${card.name} a colecao`,
+    [
+      {
+        name: "preco_compra",
+        label: "Preco pago",
+        type: "number",
+        min: 0,
+        step: "0.01",
+        required: true,
+        value: existingCard?.preco_compra ?? "",
+      },
+      {
+        name: "quantidade",
+        label: "Quantidade",
+        type: "number",
+        min: 1,
+        step: 1,
+        value: existingCard?.quantidade ?? 1,
+      },
+      {
+        name: "estado",
+        label: "Estado da carta",
+        type: "select",
+        options: collectionStates,
+        value: existingCard?.estado || "Near Mint",
+      },
+      {
+        name: "observacoes",
+        label: "Observacoes",
+        type: "textarea",
+        value: existingCard?.observacoes || "",
+      },
+    ],
+    async (values) => {
+      const user = PokemonApi.requireAuthenticatedUser();
+
+      if (!user) {
+        return;
+      }
+
+      const payload = {
+        ...buildBaseCardPayload(card),
+        preco_compra: Number(values.preco_compra),
+        quantidade: Number(values.quantidade || 1),
+        estado: values.estado,
+        observacoes: values.observacoes || "",
+      };
+
+      if (isEdit) {
+        await PokemonApi.updateCollectionCard(user.id, card.cardId, payload);
+      } else {
+        await PokemonApi.addCollectionCard(user.id, payload);
+      }
+
+      await refreshCollection();
+      showPopup(isEdit ? "Carta atualizada na colecao." : "Carta adicionada a colecao.");
+    }
+  );
+}
+
+function openWishlistModal(card, existingCard = null) {
+  const isEdit = Boolean(existingCard);
+
+  openCardModal(
+    isEdit ? `Editar ${card.name}` : `Adicionar ${card.name} a wishlist`,
+    [
+      {
+        name: "preco_alvo",
+        label: "Preco alvo",
+        type: "number",
+        min: 0,
+        step: "0.01",
+        required: true,
+        value: existingCard?.preco_alvo ?? "",
+      },
+      {
+        name: "prioridade",
+        label: "Prioridade",
+        type: "select",
+        options: wishlistPriorities,
+        value: existingCard?.prioridade || "media",
+      },
+    ],
+    async (values) => {
+      const user = PokemonApi.requireAuthenticatedUser();
+
+      if (!user) {
+        return;
+      }
+
+      const payload = {
+        ...buildBaseCardPayload(card),
+        preco_alvo: Number(values.preco_alvo),
+        prioridade: values.prioridade,
+      };
+
+      if (isEdit) {
+        await PokemonApi.updateWishlistCard(user.id, card.cardId, payload);
+      } else {
+        await PokemonApi.addWishlistCard(user.id, payload);
+      }
+
+      await refreshWishlist();
+      showPopup(isEdit ? "Carta atualizada na wishlist." : "Carta adicionada a wishlist.");
+    }
+  );
+}
+
+async function removeCollectionCard(card) {
+  const user = PokemonApi.requireAuthenticatedUser();
+
+  if (!user || !confirm(`Remover ${card.name} da colecao?`)) {
+    return;
+  }
+
+  try {
+    await PokemonApi.deleteCollectionCard(user.id, card.cardId);
+    await refreshCollection();
+    showPopup("Carta removida da colecao.");
+  } catch (error) {
+    showErrorPopup(error.message || "Nao foi possivel remover a carta.");
+  }
+}
+
+async function removeWishlistCard(card) {
+  const user = PokemonApi.requireAuthenticatedUser();
+
+  if (!user || !confirm(`Remover ${card.name} da wishlist?`)) {
+    return;
+  }
+
+  try {
+    await PokemonApi.deleteWishlistCard(user.id, card.cardId);
+    await refreshWishlist();
+    showPopup("Carta removida da wishlist.");
+  } catch (error) {
+    showErrorPopup(error.message || "Nao foi possivel remover a carta.");
+  }
 }
 
 function applyFilters(scope) {
@@ -758,6 +1423,11 @@ window.addEventListener("click", function (event) {
 
 document.addEventListener("DOMContentLoaded", function () {
   const defaultOpen = document.getElementById("defaultOpen");
+  const user = PokemonApi.requireAuthenticatedUser();
+
+  if (!user) {
+    return;
+  }
 
   setupSearchInputs();
 
@@ -767,4 +1437,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
   loadPokemonIndex();
   loadExpansions();
+  loadUserLists();
 });

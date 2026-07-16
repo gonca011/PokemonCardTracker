@@ -1,7 +1,12 @@
-const express = require("express");
+const path = require("path");
 const cors = require("cors");
+const express = require("express");
+const { initializeDatabase } = require("./backend/database/initialize");
+const apiRoutes = require("./backend/routes");
+const errorHandler = require("./backend/middleware/errorHandler");
+
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(
   cors({
@@ -14,23 +19,19 @@ app.use(
     ],
   })
 );
-app.use(express.json()); // To parse JSON bodies
 
-let storedData = null;
-// POST endpoint sends data and receives
-//Works
-app.post("/api/data", (req, res) => {
-  storedData = req.body;
-  res.send({ received: storedData });
-});
+app.use(express.json());
+app.use(express.static(path.resolve(__dirname, "..")));
+app.use("/api", apiRoutes);
+app.use(errorHandler);
 
-app.get("/api/data", (req, res) => {
-  res.send({ received: storedData });
-});
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
-
-// To run
-//node server.js
+initializeDatabase()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Could not start server:", error);
+    process.exit(1);
+  });

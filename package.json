@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node scripts/server.js",
+    "migrate": "node scripts/backend/migrate.js",
+    "test": "node --check scripts/server.js && node --check scripts/api_client.js && node --check scripts/Tabs.js && node --check scripts/Login.js && node --check scripts/SaveRegisto.js && node --check scripts/perfil.js"
   },
   "keywords": [],
   "author": "",
@@ -11,6 +13,8 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "sequelize": "^6.37.8",
+    "sqlite3": "^6.0.1"
   }
 }

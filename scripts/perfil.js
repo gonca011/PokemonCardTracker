@@ -1,54 +1,108 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const utilizadorAutenticado = JSON.parse(
-        localStorage.getItem("utilizador_autenticado")
-    );
+const profileCurrencyFormatter = new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency: "EUR",
+});
+
+function setProfileField(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.value = value || "";
+    }
+}
+
+function setProfileText(id, value) {
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+function fillProfile(user) {
+    setProfileField("profileName", user.username);
+    setProfileField("profileEmail", user.email);
+}
+
+async function loadProfileStats() {
+    const user = PokemonApi.getAuthenticatedUser();
+
+    if (!user?.id) {
+        return;
+    }
+
+    try {
+        const stats = await PokemonApi.getStats(user.id);
+        const topExpansion = stats.expansaoComMaisCartas
+            ? `${stats.expansaoComMaisCartas.expansao} (${stats.expansaoComMaisCartas.quantidade})`
+            : "Sem cartas";
+
+        setProfileText("statTotalCards", stats.totalCartas);
+        setProfileText("statUniqueCards", stats.cartasUnicas);
+        setProfileText("statTotalInvested", profileCurrencyFormatter.format(stats.valorTotalInvestido));
+        setProfileText("statAveragePrice", profileCurrencyFormatter.format(stats.precoMedioPorCarta));
+        setProfileText("statWishlistCards", stats.cartasWishlist);
+        setProfileText("statTopExpansion", topExpansion);
+    } catch (error) {
+        console.error("Erro ao carregar estatisticas:", error);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const utilizadorAutenticado = PokemonApi.requireAuthenticatedUser();
 
     if (!utilizadorAutenticado) {
-        alert("Nenhum utilizador autenticado encontrado.");
+        return;
+    }
+
+    fillProfile(utilizadorAutenticado);
+
+    try {
+        const utilizador = await PokemonApi.getUser(utilizadorAutenticado.id);
+        const normalizedUser = PokemonApi.setAuthenticatedUser(utilizador);
+
+        fillProfile(normalizedUser);
+    } catch (error) {
+        alert(error.message || "Utilizador nao encontrado.");
+        PokemonApi.clearAuthenticatedUser();
         window.location.href = "login.html";
         return;
     }
 
-    // Preenche os campos do perfil
-    document.getElementById("profileName").value =
-        utilizadorAutenticado.nome;
+    loadProfileStats();
 
-    document.getElementById("profileEmail").value =
-        utilizadorAutenticado.login;
-});
+    const saveProfileButton = document.getElementById("saveProfile");
+    const logoutButton = document.getElementById("logoutButton");
 
-document.getElementById("saveProfile").addEventListener("click", () => {
-    const banco = obterBanco();
+    if (saveProfileButton) {
+        saveProfileButton.addEventListener("click", async () => {
+            const currentUser = PokemonApi.requireAuthenticatedUser();
 
-    const utilizadorAutenticado = JSON.parse(
-        localStorage.getItem("utilizador_autenticado")
-    );
+            if (!currentUser) {
+                return;
+            }
 
-    const utilizador = banco.utilizadores.find(
-        u => u.login === utilizadorAutenticado.login
-    );
+            try {
+                const updatedUser = await PokemonApi.updateUser(currentUser.id, {
+                    username: document.getElementById("profileName").value.trim(),
+                    email: document.getElementById("profileEmail").value.trim(),
+                });
 
-    if (!utilizador) {
-        alert("Utilizador não encontrado.");
-        return;
+                const normalizedUser = PokemonApi.setAuthenticatedUser(updatedUser);
+                fillProfile(normalizedUser);
+                alert("Perfil atualizado com sucesso!");
+            } catch (error) {
+                alert(error.message || "Nao foi possivel atualizar o perfil.");
+            }
+        });
     }
 
-    utilizador.nome = document.getElementById("profileName").value;
-    utilizador.login = document.getElementById("profileEmail").value;
-
-    localStorage.setItem("banco", JSON.stringify(banco));
-
-    // Atualiza também a sessão atual
-    localStorage.setItem(
-        "utilizador_autenticado",
-        JSON.stringify(utilizador)
-    );
-
-    alert("Perfil atualizado com sucesso!");
+    if (logoutButton) {
+        logoutButton.addEventListener("click", () => {
+            PokemonApi.clearAuthenticatedUser();
+            window.location.href = "login.html";
+        });
+    }
 });
 
-document.getElementById("logoutButton").addEventListener("click", () => {
-    localStorage.removeItem("utilizador_autenticado");
-
-    window.location.href = "login.html";
-});
+document.addEventListener("pokemon:user-data-updated", loadProfileStats);
