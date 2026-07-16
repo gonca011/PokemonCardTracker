@@ -1,19 +1,22 @@
-const fs = require("fs");
-const path = require("path");
 const { Sequelize } = require("sequelize");
 
-const dataDirectory = path.resolve(__dirname, "../../../data");
-const storage = path.join(dataDirectory, "pokemon_card_tracker.sqlite");
+const isProduction = process.env.NODE_ENV === "production";
 
-fs.mkdirSync(dataDirectory, { recursive: true });
 
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage,
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: "postgres",
   logging: false,
+  dialectOptions: isProduction
+    ? {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false,
+        },
+      }
+    : {},
 });
 
 module.exports = {
   sequelize,
-  storage,
 };
+
