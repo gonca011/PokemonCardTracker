@@ -22,6 +22,10 @@ app.use(
   })
 );
 
+app.get("/", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "..", "html", "login.html"));
+});
+
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname, "..")));
 app.use("/api", apiRoutes);
