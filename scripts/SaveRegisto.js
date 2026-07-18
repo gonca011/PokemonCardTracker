@@ -25,7 +25,7 @@ async function saveFormData() {
         showPopup("Registo efetuado com sucesso!");
 
         setTimeout(() => {
-            window.location.href = "login.html";
+            window.location.href = "/html/login.html";
         }, 1000);
     } catch (error) {
         showErrorPopup(error.message || "Nao foi possivel efetuar o registo.");

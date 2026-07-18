@@ -9,7 +9,7 @@ async function login() {
         showPopup("Login efetuado com sucesso!");
 
         setTimeout(() => {
-            window.location.href = "mainpage.html";
+            window.location.href = "/html/mainpage.html";
         }, 1000);
     } catch (error) {
         showErrorPopup(error.message || "Nao foi possivel efetuar login.");
@@ -76,7 +76,7 @@ async function handleCredentialResponse(response) {
         showPopup("Login efetuado com sucesso!");
 
         setTimeout(() => {
-            window.location.href = "mainpage.html";
+            window.location.href = "/html/mainpage.html";
         }, 1000);
     } catch (error) {
         showErrorPopup(error.message || "Este email Google nao esta registado.");

@@ -70,7 +70,7 @@ const PokemonApi = (() => {
     const user = getAuthenticatedUser();
 
     if (!user?.id) {
-      window.location.href = "login.html";
+      window.location.href = "/html/login.html";
       return null;
     }
 

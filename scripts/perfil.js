@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
         alert(error.message || "Utilizador nao encontrado.");
         PokemonApi.clearAuthenticatedUser();
-        window.location.href = "login.html";
+        window.location.href = "/html/login.html";
         return;
     }
 
@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (logoutButton) {
         logoutButton.addEventListener("click", () => {
             PokemonApi.clearAuthenticatedUser();
-            window.location.href = "login.html";
+            window.location.href = "/html/login.html";
         });
     }
 });
