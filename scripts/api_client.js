@@ -1,9 +1,5 @@
 const PokemonApi = (() => {
-  const apiBaseUrl =
-    window.location.origin === "http://localhost:3000" ||
-    window.location.origin === "http://127.0.0.1:3000"
-      ? "/api"
-      : "http://localhost:3000/api";
+  const apiBaseUrl = "/api";
   const sessionKey = "pokemon_card_tracker_user";
 
   function normalizeUser(user) {
