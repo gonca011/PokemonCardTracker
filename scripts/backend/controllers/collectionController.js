@@ -1,4 +1,5 @@
 const collectionService = require("../services/collectionService");
+const CollectionCard = require("../models/CollectionCard");
 
 async function list(req, res) {
   const collection = await collectionService.listCollection(req.params.id);
@@ -28,7 +29,7 @@ async function remove(req, res) {
   res.status(204).send();
 }
 
-async function getCollectionEvolution(req, res, next) {
+async function getCollectionEvolution(req, res) {
     try {
         const userId = req.params.id;
 
@@ -38,8 +39,14 @@ async function getCollectionEvolution(req, res, next) {
         });
 
         res.json(cards);
+
     } catch (err) {
-        next(err);
+        console.error(err);
+
+        res.status(500).json({
+            message: err.message,
+            stack: err.stack
+        });
     }
 }
 
