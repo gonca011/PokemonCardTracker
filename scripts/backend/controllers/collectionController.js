@@ -28,9 +28,25 @@ async function remove(req, res) {
   res.status(204).send();
 }
 
+async function getCollectionEvolution(req, res, next) {
+    try {
+        const userId = req.params.id;
+
+        const cards = await CollectionCard.findAll({
+            where: { userId },
+            order: [["data_registo", "ASC"]]
+        });
+
+        res.json(cards);
+    } catch (err) {
+        next(err);
+    }
+}
+
 module.exports = {
   create,
   list,
   remove,
   update,
+  getCollectionEvolution
 };

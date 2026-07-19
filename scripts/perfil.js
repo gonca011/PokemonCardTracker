@@ -69,7 +69,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    loadProfileStats();
+    await loadProfileStats();
+    await renderCollectionEvolutionChart();
 
     const saveProfileButton = document.getElementById("saveProfile");
     const logoutButton = document.getElementById("logoutButton");
@@ -104,5 +105,76 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
+
+async function loadCollectionEvolution(userId) {
+    return PokemonApi.getCollectionEvolution(userId);
+}
+
+async function renderCollectionEvolutionChart() {
+    const user = PokemonApi.getAuthenticatedUser();
+
+    if (!user?.id) return;
+
+    try {
+        const cards = await loadCollectionEvolution(user.id);
+
+        cards.sort((a, b) =>
+            new Date(a.data_registo) - new Date(b.data_registo)
+        );
+
+        const labels = [];
+        const values = [];
+
+        let total = 0;
+
+        for (const card of cards) {
+            total += Number(card.preco_compra) * Number(card.quantidade);
+
+            labels.push(
+                new Date(card.data_registo).toLocaleDateString("pt-PT")
+            );
+
+            values.push(total);
+        }
+
+        const canvas = document.getElementById("collectionEvolutionChart");
+
+        if (!canvas) return;
+
+        const ctx = canvas.getContext("2d");
+
+        if (window.collectionChart) {
+            window.collectionChart.destroy();
+        }
+
+        window.collectionChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels,
+                datasets: [{
+                    label: "Valor investido (€)",
+                    data: values,
+                    borderColor: "#0d6efd",
+                    backgroundColor: "rgba(13,110,253,0.15)",
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+
+    } catch (err) {
+        console.error("Erro ao carregar evolução:", err);
+    }
+}
+
 
 document.addEventListener("pokemon:user-data-updated", loadProfileStats);

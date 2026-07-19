@@ -90,6 +90,7 @@ const PokemonApi = (() => {
       request(`/users/${encodeURIComponent(userId)}`, { method: "PUT", body: payload }),
     getStats: (userId) => request(`/users/${encodeURIComponent(userId)}/stats`),
     getCollection: (userId) => request(`/users/${encodeURIComponent(userId)}/collection`),
+    getCollectionEvolution: (userId) => request(`/users/${encodeURIComponent(userId)}/collection/evolution`),
     addCollectionCard: (userId, payload) =>
       request(`/users/${encodeURIComponent(userId)}/collection`, {
         method: "POST",
