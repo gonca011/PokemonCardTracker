@@ -461,8 +461,12 @@ function selectExpansion(element, expansion) {
   setActiveFilter(scope, expansion);
   closeAllDropdowns();
 
-  if (scope?.id === "Pesquisa" && expansion !== "all") {
-    loadCards(expansion, getCardContainer(element));
+  if (scope?.id === "Pesquisa") {
+    if (expansion === "all") {
+      loadAllCards(getCardContainer(element));
+    } else {
+      loadCards(expansion, getCardContainer(element));
+    }
     return;
   }
 
@@ -473,6 +477,37 @@ function getCardContainer(element) {
   const currentTab = element?.closest(".tabcontent");
 
   return currentTab?.querySelector(".cardContainer") || document.getElementById("cardContainer");
+}
+
+async function loadAllCards(container = document.getElementById("cardContainer")) {
+  if (!container) {
+    return;
+  }
+
+  showCardMessage(container, "A carregar todas as cartas...");
+
+  try {
+    const entries = await loadJsonFile(`${CARDS_BASE_PATH}all_cards.json`);
+
+    await loadPokemonIndex();
+
+    const cards = entries
+      .map(entry => createCardModel(entry.file, entry.expansion))
+      .filter(Boolean);
+
+    storeCards(container, cards);
+    renderCards(container, cards);
+    updateSearchActionStates();
+  } catch (error) {
+    console.error("Erro ao carregar todas as cartas:", error);
+
+    storeCards(container, []);
+
+    showCardMessage(
+      container,
+      "Não foi possível carregar todas as cartas."
+    );
+  }
 }
 
 async function loadCards(expansion, container = document.getElementById("cardContainer")) {
