@@ -1534,22 +1534,34 @@ async function openPriceHistory(card) {
 function drawHistoryChart(priceHistory) {
 
     priceHistory.sort((a, b) =>
-        new Date(a.changed_at) - new Date(b.changed_at)
+        new Date(a.dataAlteracao) - new Date(b.dataAlteracao)
     );
 
-    const labels = priceHistory.map(item =>
-        new Date(item.changed_at).toLocaleDateString("pt-PT")
-    );
+    const labels = [];
+    const values = [];
 
-    const values = priceHistory.map(item =>
-        Number(item.preco)
-    );
+    if (priceHistory.length > 0) {
+        labels.push("Compra");
+        values.push(Number(priceHistory[0].valorAntigo));
+    }
+
+    priceHistory.forEach(item => {
+        labels.push(
+            new Date(item.dataAlteracao).toLocaleDateString("pt-PT")
+        );
+
+        values.push(Number(item.valorNovo));
+    });
 
     const ctx = document
         .getElementById("priceHistoryChart")
         .getContext("2d");
 
-    new Chart(ctx, {
+    if (window.priceHistoryChart) {
+        window.priceHistoryChart.destroy();
+    }
+
+    window.priceHistoryChart = new Chart(ctx, {
         type: "line",
         data: {
             labels,
@@ -1564,7 +1576,15 @@ function drawHistoryChart(priceHistory) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    ticks: {
+                        callback: value => value + " €"
+                    }
+                }
+            }
         }
     });
 }
