@@ -64,7 +64,7 @@ async function createCollectionCard(userId, payload) {
   });
 
   if (existingCard) {
-    throw new ApiError(409, "Esta carta ja existe na colecao.");
+    throw new ApiError(409, "Esta carta ja existe na coleção.");
   }
 
   const card = await CollectionCard.create(createPayload);
@@ -78,7 +78,7 @@ async function updateCollectionCard(userId, cardId, payload) {
   const card = await CollectionCard.findOne({ where: { userId, cardId } });
 
   if (!card) {
-    throw new ApiError(404, "Carta nao encontrada na colecao.");
+    throw new ApiError(404, "Carta nao encontrada na coleção.");
   }
 
   await card.update(buildUpdatePayload(payload));
@@ -92,7 +92,7 @@ async function deleteCollectionCard(userId, cardId) {
   const deletedCount = await CollectionCard.destroy({ where: { userId, cardId } });
 
   if (deletedCount === 0) {
-    throw new ApiError(404, "Carta nao encontrada na colecao.");
+    throw new ApiError(404, "Carta nao encontrada na coleção.");
   }
 }
 

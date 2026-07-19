@@ -703,7 +703,7 @@ function renderUserCollection() {
   storeCards(container, cards);
 
   if (cards.length === 0) {
-    showCardMessage(container, "Ainda nao tens cartas na colecao.");
+    showCardMessage(container, "Ainda nao tens cartas na coleção.");
     return;
   }
 
@@ -744,7 +744,7 @@ async function loadUserLists() {
   const wishlistContainer = getScopeContainer(getWishlistScope());
 
   if (collectionContainer) {
-    showCardMessage(collectionContainer, "A carregar colecao...");
+    showCardMessage(collectionContainer, "A carregar coleção...");
   }
 
   if (wishlistContainer) {
@@ -770,7 +770,7 @@ async function loadUserLists() {
     console.error("Erro ao carregar dados do utilizador:", error);
 
     if (collectionContainer) {
-      showCardMessage(collectionContainer, "Nao foi possivel carregar a colecao.");
+      showCardMessage(collectionContainer, "Nao foi possivel carregar a coleção.");
     }
 
     if (wishlistContainer) {
@@ -811,7 +811,7 @@ function renderCards(container, cards) {
   container.innerHTML = "";
 
   if (cards.length === 0) {
-    showCardMessage(container, "Esta expansao nao tem cartas listadas.");
+    showCardMessage(container, "Esta expansão nao tem cartas listadas.");
     return;
   }
 
