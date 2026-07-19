@@ -460,6 +460,13 @@ hr {
   font-weight: bold;
 }
 
+.history-chart {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    margin-bottom: 20px;
+}
+
 
 /* Tablet */
 @media (max-width: 992px) {

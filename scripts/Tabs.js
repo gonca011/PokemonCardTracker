@@ -1500,13 +1500,16 @@ async function openPriceHistory(card) {
     const priceHistory = await PokemonApi.getPriceHistory(user.id, card.cardId);
 
     let html = `
-        <canvas id="priceHistoryChart" height="250"></canvas>
+        <div class="history-chart">
+            <canvas id="priceHistoryChart"></canvas>
+        </div>
 
         <table class="history-table">
             <thead>
                 <tr>
                     <th>Data</th>
                     <th>Preço</th>
+                    <th>Preço anterior</th>
                 </tr>
             </thead>
             <tbody>
@@ -1560,7 +1563,6 @@ function drawHistoryChart(priceHistory) {
 
     const ctx = canvas.getContext("2d");
 
-    // destruir gráfico anterior
     if (
         window.priceHistoryChart &&
         typeof window.priceHistoryChart.destroy === "function"
@@ -1568,7 +1570,6 @@ function drawHistoryChart(priceHistory) {
         window.priceHistoryChart.destroy();
     }
 
-    // guardar o objeto Chart, NÃO o canvas
     window.priceHistoryChart = new Chart(ctx, {
         type: "line",
         data: {
@@ -1585,6 +1586,8 @@ function drawHistoryChart(priceHistory) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            resizeDelay: 200,
+            animation: false,
             scales: {
                 y: {
                     beginAtZero: false,
