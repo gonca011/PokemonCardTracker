@@ -1021,7 +1021,7 @@ function createCardActions(card) {
   }
 
   actions.appendChild(
-    createActionButton("Colecao", () => openCollectionModal(card), {
+    createActionButton("Coleção", () => openCollectionModal(card), {
       action: "add-collection",
       disabled: isCardInCollection(card.cardId),
     })
@@ -1046,7 +1046,7 @@ function updateSearchActionStates() {
       const exists = isCardInCollection(cardId);
 
       collectionButton.disabled = exists;
-      collectionButton.textContent = exists ? "Na colecao" : "Colecao";
+      collectionButton.textContent = exists ? "Na coleção" : "Coleção";
     }
 
     if (wishlistButton) {
@@ -1214,7 +1214,7 @@ function openCollectionModal(card, existingCard = null) {
   const isEdit = Boolean(existingCard);
 
   openCardModal(
-    isEdit ? `Editar ${card.name}` : `Adicionar ${card.name} a colecao`,
+    isEdit ? `Editar ${card.name}` : `Adicionar ${card.name} a coleção`,
     [
       {
         name: "preco_compra",
@@ -1269,7 +1269,7 @@ function openCollectionModal(card, existingCard = null) {
       }
 
       await refreshCollection();
-      showPopup(isEdit ? "Carta atualizada na colecao." : "Carta adicionada a colecao.");
+      showPopup(isEdit ? "Carta atualizada na coleção." : "Carta adicionada a coleção.");
     }
   );
 }
@@ -1325,14 +1325,14 @@ function openWishlistModal(card, existingCard = null) {
 async function removeCollectionCard(card) {
   const user = PokemonApi.requireAuthenticatedUser();
 
-  if (!user || !confirm(`Remover ${card.name} da colecao?`)) {
+  if (!user || !confirm(`Remover ${card.name} da coleção?`)) {
     return;
   }
 
   try {
     await PokemonApi.deleteCollectionCard(user.id, card.cardId);
     await refreshCollection();
-    showPopup("Carta removida da colecao.");
+    showPopup("Carta removida da coleção.");
   } catch (error) {
     showErrorPopup(error.message || "Nao foi possivel remover a carta.");
   }
