@@ -1238,6 +1238,46 @@ function openCardModal(title, fields, onSubmit) {
   document.body.appendChild(overlay);
 }
 
+function openHtmlModal(title, html) {
+    const overlay = document.createElement("div");
+    const dialog = document.createElement("div");
+    const heading = document.createElement("h3");
+    const content = document.createElement("div");
+    const actions = document.createElement("div");
+    const closeButton = document.createElement("button");
+
+    overlay.className = "modal-overlay";
+    dialog.className = "card-modal";
+
+    heading.textContent = title;
+
+    content.innerHTML = html;
+
+    actions.className = "modal-actions";
+
+    closeButton.type = "button";
+    closeButton.className = "btn btn-primary";
+    closeButton.textContent = "Fechar";
+
+    closeButton.addEventListener("click", () => closeModal(overlay));
+
+    overlay.addEventListener("click", (event) => {
+        if (event.target === overlay) {
+            closeModal(overlay);
+        }
+    });
+
+    actions.appendChild(closeButton);
+
+    dialog.appendChild(heading);
+    dialog.appendChild(content);
+    dialog.appendChild(actions);
+
+    overlay.appendChild(dialog);
+
+    document.body.appendChild(overlay);
+}
+
 function buildBaseCardPayload(card) {
   return {
     cardId: card.cardId,
