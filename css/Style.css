@@ -57,12 +57,13 @@ h3 {
 }
 
 header {
-  padding: 20px;
+  padding: 1rem;
 }
 
 h1 {
-  font-size: 50px;
-  word-break: break-all;
+    font-size: clamp(2rem, 5vw, 3rem);
+    word-break: break-word;
+    text-align: center;
 }
 
 .row {
@@ -77,17 +78,19 @@ h1 {
 
 /* Create three equal columns that floats next to each other */
 .column {
-  float: left;
-  width: 33.33%;
-  display: none; /* Hide columns by default */
+  display: none;
 }
 
-/* Clear floats after rows */
+.column.show {
+  display: block;
+}
+
+/* Clear floats after rows 
 .row:after {
   content: "";
   display: table;
   clear: both;
-}
+}*/
 
 /* Content */
 .content {
@@ -242,8 +245,8 @@ hr {
 }
 
 .pokemon-sprite {
-  width: 48px;
-  height: 48px;
+  width: clamp(36px, 5vw, 48px);
+  height: clamp(36px, 5vw, 48px);
   object-fit: contain;
   image-rendering: pixelated;
 }
@@ -251,22 +254,27 @@ hr {
 .pokemon-group-title {
   margin: 0;
   color: white;
-  font-size: 24px;
+  font-size: clamp(20px, 3vw, 30px);
   line-height: 1.2;
 }
 
 .pokemon-group-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
   width: 100%;
 }
 
+/*
 .pokemon-group-cards:after {
   content: "";
   display: table;
   clear: both;
-}
+}*/
 
 .pokemon-group-cards > .column {
-  padding: 8px;
+  width: auto;
+  padding: 0;
 }
 
 .card-content {
@@ -449,4 +457,59 @@ hr {
   margin: 16px 8px;
   color: white;
   font-weight: bold;
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+
+  .tabcontent {
+    padding: 80px 16px;
+  }
+
+}
+
+/* Telemóvel */
+@media (max-width: 576px) {
+
+  .tabcontent {
+    padding: 70px 10px;
+  }
+
+  header {
+    padding: 1rem;
+  }
+
+  .tablink {
+    width: 100%;
+    float: none;
+    display: block;
+    font-size: 16px;
+  }
+
+  .pokemon-group-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .pokemon-sprite {
+    width: 40px;
+    height: 40px;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .card-action-btn {
+    width: 100%;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+
 }
