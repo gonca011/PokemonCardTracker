@@ -12,7 +12,7 @@ router.get("/:id/stats", asyncHandler(userController.getStats));
 
 router.get("/:id/collection", asyncHandler(collectionController.list));
 router.get("/:id/collection/evolution", asyncHandler(collectionController.getCollectionEvolution));
-router.get("/:id/collection/:cardId/history", asyncHandler(collectionController.history));
+router.get("/:id/collection/:cardId/history", asyncHandler(collectionController.getPricehistory));
 router.post("/:id/collection", asyncHandler(collectionController.create));
 router.put("/:id/collection/:cardId", asyncHandler(collectionController.update));
 router.delete("/:id/collection/:cardId", asyncHandler(collectionController.remove));

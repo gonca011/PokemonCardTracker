@@ -112,7 +112,7 @@ async function deleteCollectionCard(userId, cardId) {
   }
 }
 
-async function getHistory(userId, cardId) {
+async function getPriceHistory(userId, cardId) {
 
     await findUserOrFail(userId);
 
@@ -136,4 +136,5 @@ module.exports = {
   deleteCollectionCard,
   listCollection,
   updateCollectionCard,
+  getPriceHistory
 };

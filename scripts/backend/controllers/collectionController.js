@@ -50,9 +50,9 @@ async function getCollectionEvolution(req, res) {
     }
 }
 
-async function history(req, res) {
+async function getPriceHistory(req, res) {
 
-    const history = await collectionService.getHistory(
+    const history = await collectionService.getPriceHistory(
         req.params.id,
         req.params.cardId
     );
@@ -66,5 +66,5 @@ module.exports = {
   remove,
   update,
   getCollectionEvolution,
-  history
+  getPriceHistory
 };
