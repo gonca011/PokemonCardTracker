@@ -1497,7 +1497,7 @@ async function openPriceHistory(card) {
 
     if (!user) return;
 
-    const history = await PokemonApi.getPriceHistory(user.id, card.cardId);
+    const priceHistory = await PokemonApi.getPriceHistory(user.id, card.cardId);
 
     let html = `
         <canvas id="priceHistoryChart" height="250"></canvas>
@@ -1512,7 +1512,7 @@ async function openPriceHistory(card) {
             <tbody>
     `;
 
-    history.forEach(item => {
+    priceHistory.forEach(item => {
         html += `
             <tr>
                 <td>${new Date(item.changed_at).toLocaleString("pt-PT")}</td>
@@ -1528,20 +1528,20 @@ async function openPriceHistory(card) {
 
     openHtmlModal("Histórico de preços", html);
 
-    drawHistoryChart(history);
+    drawHistoryChart(priceHistory);
 }
 
-function drawHistoryChart(history) {
+function drawHistoryChart(priceHistory) {
 
-    history.sort((a, b) =>
+    priceHistory.sort((a, b) =>
         new Date(a.changed_at) - new Date(b.changed_at)
     );
 
-    const labels = history.map(item =>
+    const labels = priceHistory.map(item =>
         new Date(item.changed_at).toLocaleDateString("pt-PT")
     );
 
-    const values = history.map(item =>
+    const values = priceHistory.map(item =>
         Number(item.preco)
     );
 

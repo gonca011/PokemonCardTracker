@@ -52,12 +52,12 @@ async function getCollectionEvolution(req, res) {
 
 async function getPriceHistory(req, res) {
 
-    const history = await collectionService.getPriceHistory(
+    const priceHistory = await collectionService.getPriceHistory(
         req.params.id,
         req.params.cardId
     );
 
-    res.json(history);
+    res.json(priceHistory);
 }
 
 module.exports = {
