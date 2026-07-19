@@ -1515,8 +1515,9 @@ async function openPriceHistory(card) {
     priceHistory.forEach(item => {
         html += `
             <tr>
-                <td>${new Date(item.changed_at).toLocaleString("pt-PT")}</td>
-                <td>${Number(item.preco).toFixed(2)} €</td>
+                <td>${new Date(item.dataAlteracao).toLocaleString("pt-PT")}</td>
+                <td>${Number(item.valorNovo).toFixed(2)} €</td>
+                <td>${Number(item.valorAntigo).toFixed(2)} €</td>
             </tr>
         `;
     });
@@ -1553,14 +1554,21 @@ function drawHistoryChart(priceHistory) {
         values.push(Number(item.valorNovo));
     });
 
-    const ctx = document
-        .getElementById("priceHistoryChart")
-        .getContext("2d");
+    const canvas = document.getElementById("priceHistoryChart");
 
-    if (window.priceHistoryChart) {
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    // destruir gráfico anterior
+    if (
+        window.priceHistoryChart &&
+        typeof window.priceHistoryChart.destroy === "function"
+    ) {
         window.priceHistoryChart.destroy();
     }
 
+    // guardar o objeto Chart, NÃO o canvas
     window.priceHistoryChart = new Chart(ctx, {
         type: "line",
         data: {
