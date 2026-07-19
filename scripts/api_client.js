@@ -106,6 +106,10 @@ const PokemonApi = (() => {
         `/users/${encodeURIComponent(userId)}/collection/${encodeURIComponent(cardId)}`,
         { method: "DELETE" }
       ),
+    getPriceHistory: (userId, cardId) =>
+    request(
+        `/users/${encodeURIComponent(userId)}/collection/${encodeURIComponent(cardId)}/history`
+    ),
     getWishlist: (userId) => request(`/users/${encodeURIComponent(userId)}/wishlist`),
     addWishlistCard: (userId, payload) =>
       request(`/users/${encodeURIComponent(userId)}/wishlist`, {

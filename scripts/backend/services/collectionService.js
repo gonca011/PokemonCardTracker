@@ -1,4 +1,5 @@
 const ApiError = require("../errors/ApiError");
+const CollectionHistory = require("../models/CollectionHistory");
 const { CollectionCard } = require("../models");
 const { serializeCollectionCard } = require("./serializers");
 const {
@@ -81,7 +82,22 @@ async function updateCollectionCard(userId, cardId, payload) {
     throw new ApiError(404, "Carta nao encontrada na coleção.");
   }
 
-  await card.update(buildUpdatePayload(payload));
+  const updates = buildUpdatePayload(payload);
+
+  for (const campo of Object.keys(updates)) {
+
+      if (String(card[campo]) !== String(updates[campo])) {
+
+          await CollectionHistory.create({
+              collectionCardId: card.id,
+              campo,
+              valorAntigo: card[campo],
+              valorNovo: updates[campo]
+          });
+      }
+  }
+
+  await card.update(updates);
 
   return serializeCollectionCard(card);
 }
@@ -94,6 +110,25 @@ async function deleteCollectionCard(userId, cardId) {
   if (deletedCount === 0) {
     throw new ApiError(404, "Carta nao encontrada na coleção.");
   }
+}
+
+async function getHistory(userId, cardId) {
+
+    await findUserOrFail(userId);
+
+    const card = await CollectionCard.findOne({
+        where: { userId, cardId }
+    });
+
+    if (!card)
+        throw new ApiError(404, "Carta não encontrada.");
+
+    return CollectionHistory.findAll({
+        where: {
+            collectionCardId: card.id
+        },
+        order: [["dataAlteracao", "DESC"]]
+    });
 }
 
 module.exports = {

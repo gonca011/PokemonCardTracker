@@ -1042,6 +1042,8 @@ function createCardActions(card) {
         className: "card-action-btn danger",
       })
     );
+    actions.appendChild(
+    createActionButton("Histórico", () => openPriceHistory(card)));
     return actions;
   }
 
@@ -1448,6 +1450,83 @@ function showCardMessage(container, message) {
   status.className = "card-status";
   status.textContent = message;
   container.appendChild(status);
+}
+
+async function openPriceHistory(card) {
+    const user = PokemonApi.requireAuthenticatedUser();
+
+    if (!user) return;
+
+    const history = await PokemonApi.getPriceHistory(user.id, card.cardId);
+
+    let html = `
+        <canvas id="priceHistoryChart" height="250"></canvas>
+
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Preço</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    history.forEach(item => {
+        html += `
+            <tr>
+                <td>${new Date(item.changed_at).toLocaleString("pt-PT")}</td>
+                <td>${Number(item.preco).toFixed(2)} €</td>
+            </tr>
+        `;
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    openHtmlModal("Histórico de preços", html);
+
+    drawHistoryChart(history);
+}
+
+function drawHistoryChart(history) {
+
+    history.sort((a, b) =>
+        new Date(a.changed_at) - new Date(b.changed_at)
+    );
+
+    const labels = history.map(item =>
+        new Date(item.changed_at).toLocaleDateString("pt-PT")
+    );
+
+    const values = history.map(item =>
+        Number(item.preco)
+    );
+
+    const ctx = document
+        .getElementById("priceHistoryChart")
+        .getContext("2d");
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels,
+            datasets: [{
+                label: "Preço pago (€)",
+                data: values,
+                borderColor: "#198754",
+                backgroundColor: "rgba(25,135,84,0.15)",
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
 }
 
 window.addEventListener("click", function (event) {

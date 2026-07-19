@@ -50,10 +50,21 @@ async function getCollectionEvolution(req, res) {
     }
 }
 
+async function history(req, res) {
+
+    const history = await collectionService.getHistory(
+        req.params.id,
+        req.params.cardId
+    );
+
+    res.json(history);
+}
+
 module.exports = {
   create,
   list,
   remove,
   update,
-  getCollectionEvolution
+  getCollectionEvolution,
+  history
 };
