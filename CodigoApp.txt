@@ -1,0 +1,11 @@
+ssh -i C:\Users\Gonçalo\Downloads\ssh-key-2026-07-16.key ubuntu@141.147.33.116
+
+cd ~/PokemonCardTracker
+git pull
+git lfs pull
+npm install
+pm2 restart pokemon-card-tracker
+
+git add README.md CodigoApp.txt
+git commit -m "Update README with image workflow"
+git push origin main
